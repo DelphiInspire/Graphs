@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include "Vector.h"
 
 
 Graph buildGraph(Node* startNode)
@@ -27,5 +28,12 @@ int main()
 	Graph test2(test);
 	test.~Graph();
 	test2.outAllEdges();
+
+	Vector mytest;
+
+	mytest.push_back(3);
+	mytest.push_back(2);
+	Vector check(mytest);
+
 	return 0;
 }
