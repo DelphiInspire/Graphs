@@ -18,8 +18,8 @@ int main()
 
 	Graph test(B);
 	test = buildGraph(A);
-	test.makeConnection(A, B, 1);
-	test.makeConnection(A, C, 2);
+	test.makeConnection(B, A, 1);
+	test.makeConnection(B, A, 1);
 	test.makeConnection(B, C, 3);
 	test.makeConnection(C, D, 4);
 	test.makeConnection(A, E, 5);
@@ -27,8 +27,6 @@ int main()
 
 	Graph test2(test);
 	test.~Graph();
-	test2.outAllEdges();
-
 	Vector mytest;
 
 	mytest.push_back(3);

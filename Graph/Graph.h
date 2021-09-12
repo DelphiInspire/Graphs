@@ -1,19 +1,15 @@
 
 #include <string>
 #include <vector>
-#include <map>
-#include <iostream>
+//#include <iostream>
 
 
 class Node
 {
 
 public:
-	Node(std::string name) : ownerName{name}
-	{	
-	};
+	Node(std::string name) : ownerName{name}{};
 	std::string getName() const { return ownerName; };
-	
 	~Node() 
 	{
 		ownerName.clear();
@@ -41,7 +37,8 @@ private:
 	std::vector<std::pair<Node*, std::vector<Edge*>*>>* collector;
 	std::pair<Node*, std::vector<Edge*>*> getNode(Node* searchNode);
 	void cleanData();
-	void copyData(const Graph * const copyGraph);
+	void copyData(const Graph* copyGraph);
+	bool isConnected(Node* inqyiryNode, std::vector<Edge*>* nodeEdges) const;
 public:
 	Graph(Node* startNode);
 	Graph(const Graph& copyGraph);
@@ -49,7 +46,7 @@ public:
 	Graph(Graph&& moveGraph);
 	Graph& operator=(Graph&& moveGraph);
 	void makeConnection(Node* parentNode, Node* childNode, int weight);
-	void outNodeEdges(Node* showMember);
-	void outAllEdges();
+	//void outNodeEdges(Node* showMember);
+	//void outAllEdges();
 	~Graph();
 };
