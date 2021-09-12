@@ -135,24 +135,3 @@ Graph::~Graph()
 	
 }
 
-
-//void Graph::removeNode(Node* removingNode)
-//{
-//	std::vector<Edge*>* connections{ getNode(removingNode).second };
-//	for (std::vector<Edge*>::iterator it = connections->begin(); it != connections->end(); it++)
-//	{
-//		Edge* partner;
-//		partner = *it;
-//		removeNode(partner->getChild());
-//		 
-//
-//	}
-//	std::pair<Node*, std::vector<Edge*>*> buffer{ getNode(removingNode) };
-//	buffer.first->~Node();
-//	for (std::vector<Edge*>::iterator it = buffer.second->begin(); it != buffer.second->end(); it++)
-//	{
-//		Edge* cleaning{ *it };
-//		getNode(cleaning->getChild()).second->
-//	}
-//
-//}
