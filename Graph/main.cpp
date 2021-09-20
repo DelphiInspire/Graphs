@@ -1,14 +1,15 @@
-#include "Graph.h"
+//#include "Graph.h"
+#include "Graph_ver2.h"
 
 
-Graph buildGraph(Node* startNode)
+Graph_link buildGraph(std::string startNode)
 {
-	return Graph(startNode);
+	return Graph_link(startNode);
 }
 
 int main()
 {
-	Node* A = new Node("A");
+	/*Node* A = new Node("A");
 	Node* B = new Node("B");
 	Node* C = new Node("C");
 	Node* D = new Node("D");
@@ -25,7 +26,14 @@ int main()
 	test.makeConnection(E, F, 6);
 
 	Graph test2(test);
-	test.~Graph();
+	test.~Graph();*/
+
+	Graph_link test("A");
+	test.newConnection("A", "B");
+	test.newConnection("A", "C");
+	test.newConnection("C", "B");
+	Graph_link test2(test);
+	test.~Graph_link();
 
 	return 0;
 }
