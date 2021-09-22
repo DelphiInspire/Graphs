@@ -1,74 +1,85 @@
 #include "Graph_ver2.h"
 
-Graph_link::Graph_link(std::string initialNode) : collector{nullptr}
+Graph::Graph(std::string initialNode) : graphNodes{nullptr}
 {
-	collector = new std::vector<LinkedList*>;
-	collector->push_back(new LinkedList(initialNode));
+	graphNodes = new std::vector<Node*>;
+	graphNodes->push_back(new Node(initialNode));
 }
 
-Graph_link::Graph_link(const Graph_link& copyGraph)
+Graph::Graph(const Graph& other)
 {
-	*this = copyGraph;
+	*this = other;
 }
 
-Graph_link::Graph_link(Graph_link&& moveGraph)
+Graph::Graph(Graph&& other)
 {
-	collector = moveGraph.collector;
-	moveGraph.collector = nullptr;
+	graphNodes = other.graphNodes;
+	other.graphNodes = nullptr;
 }
 
-Graph_link& Graph_link::operator=(const Graph_link& copyGraph)
+Graph& Graph::operator=(const Graph& copyGraph)
 {
 	if (this != &copyGraph)
 	{
 		cleanData();
-		collector = new std::vector<LinkedList*>;
+		graphNodes = new std::vector<Node*>;
 		copyData(copyGraph);
 
 	}
 	return *this;
 }
 
-Graph_link& Graph_link::operator=(Graph_link&& moveGraph)
+Graph& Graph::operator=(Graph&& moveGraph)
 {
 	if (this != &moveGraph)
 	{
 		cleanData();
-		collector = moveGraph.collector;
-		moveGraph.collector = nullptr;
+		graphNodes = moveGraph.graphNodes;
+		moveGraph.graphNodes = nullptr;
 	}
 	return *this;
 }
 
-void Graph_link::copyData(const Graph_link& copyGraph)
+void Graph::copyData(const Graph& copyGraph)
 {
-	for (size_t counter = 0; counter < copyGraph.collector->size(); counter++)
+	for (size_t basePointsCounter = 0; basePointsCounter < copyGraph.graphNodes->size(); basePointsCounter++)
 	{
-		collector->push_back(new LinkedList(*copyGraph.collector->at(counter)));
+		graphNodes->push_back(new Node(copyGraph.graphNodes->at(basePointsCounter)->getName()));
+	}
+
+	for (size_t outCounter = 0; outCounter < graphNodes->size(); outCounter++)
+	{
+		Node* copyNode{ copyGraph.graphNodes->at(outCounter) };
+		size_t connectionsSize{ copyNode->connections->size() };
+
+		for (size_t innerCounter = 0; innerCounter < connectionsSize; innerCounter++)
+		{
+			graphNodes->at(outCounter)->connections->push_back(getNode(copyNode->connections->at(innerCounter)->getName()));
+		}
 	}
 }
 
-void Graph_link::newConnection(std::string parentName, std::string childName)
+void Graph::addConnection(std::string parentName, std::string childName)
 {
-	if (getNodeCommunity(parentName) == nullptr)
+	if (getNode(parentName) == nullptr)
 	{
-		if (getNodeCommunity(childName) == nullptr)
+		if (getNode(childName) == nullptr)
 		{
 			return;
 		}
 		else
 		{
-			newConnection(childName, parentName);
+			addConnection(childName, parentName);
 		}
 	}
-	if (!getNodeCommunity(parentName)->hasEqual(childName))
+	if (!getNode(parentName)->isHasConnection(childName))
 	{
 		if (!isExist(childName))
 		{
-			collector->push_back(new LinkedList(childName));
+			graphNodes->push_back(new Node(childName));
 		}
-		getNodeCommunity(parentName)->addNode(childName);
-		getNodeCommunity(childName)->addNode(parentName);
+		getNode(parentName)->connections->push_back(getNode(childName));
+		getNode(childName)->connections->push_back(getNode(parentName));
 	}
 	else
 	{
@@ -77,24 +88,24 @@ void Graph_link::newConnection(std::string parentName, std::string childName)
 	
 }
 
-LinkedList* Graph_link::getNodeCommunity(std::string name)
+Node* Graph::getNode(std::string name) const
 {
-	for (size_t headCounter = 0; headCounter < collector->size(); headCounter++)
+	for (size_t headCounter = 0; headCounter < graphNodes->size(); headCounter++)
 	{
-		if (collector->at(headCounter)->getHead()->getName() == name)
+		if (graphNodes->at(headCounter)->getName() == name)
 		{
-			return collector->at(headCounter);
+			return graphNodes->at(headCounter);
 		}
 	}
 	return nullptr;
 }
 
-bool Graph_link::isExist(std::string name) const
+bool Graph::isExist(std::string name) const
 {
-	for (size_t counter = 0; counter < collector->size(); counter++)
+	size_t collectorSize{ graphNodes->size() };
+	for (size_t counter = 0; counter < collectorSize; counter++)
 	{
-		Node* variantNode{ collector->at(counter)->getHead() };
-		if (variantNode->getName() == name)
+		if (graphNodes->at(counter)->getName() == name)
 		{
 			return true;
 		}
@@ -102,21 +113,21 @@ bool Graph_link::isExist(std::string name) const
 	return false;
 }
 
-void Graph_link::cleanData()
+void Graph::cleanData()
 {
-	if (collector != nullptr)
+	if (graphNodes != nullptr)
 	{
-		for (std::vector<LinkedList*>::iterator listIterator = collector->begin(); listIterator != collector->end(); listIterator++)
+		for (std::vector<Node*>::iterator graphPointIterator = graphNodes->begin(); graphPointIterator != graphNodes->end(); graphPointIterator++)
 		{
-			delete* listIterator;
+			delete* graphPointIterator;
 		}
-		collector->clear();
-		delete collector;
-		collector = nullptr;
+		graphNodes->clear();
+		delete graphNodes;
+		graphNodes = nullptr;
 	}
 }
 
-Graph_link::~Graph_link()
+Graph::~Graph()
 {
 	cleanData();
 }

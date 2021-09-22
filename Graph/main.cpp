@@ -2,9 +2,9 @@
 #include "Graph_ver2.h"
 
 
-Graph_link buildGraph(std::string startNode)
+Graph buildGraph(std::string startNode)
 {
-	return Graph_link(startNode);
+	return Graph(startNode);
 }
 
 int main()
@@ -28,12 +28,12 @@ int main()
 	Graph test2(test);
 	test.~Graph();*/
 
-	Graph_link test("A");
-	test.newConnection("A", "B");
-	test.newConnection("A", "C");
-	test.newConnection("C", "B");
-	Graph_link test2(test);
-	test.~Graph_link();
+	Graph test("A");
+	test.addConnection("A", "B");
+	test.addConnection("A", "C");
+	test.addConnection("C", "B");
+	Graph test2(test);
+	test.~Graph();
 
 	return 0;
 }

@@ -5,117 +5,60 @@ class Node
 {
 private:
 	std::string name;
-	Node* next;
-public:
-	Node(std::string name) : name{ name }, next{nullptr} {};
-	std::string getName() const { return name; };
-	Node* getNext() { return next; };
-	void setNext(Node* nextNode) { next = nextNode; };
-	~Node() 
-	{ 
-		name.clear(); 
-	};
-};
-
-class LinkedList
-{
-private:
-	Node* head;
-	Node* tail;
 	void cleanConnections()
-	{	
-		while (head != nullptr)
+	{
+		if (connections != nullptr)
 		{
-			Node* connectDestroyer{ head->getNext() };
-			delete head;
-			head = connectDestroyer;
-		} 
+			connections->clear();
+			delete connections;
+			connections = nullptr;
+			name.clear();
+		}
 	}
 public:
-	LinkedList(std::string name) : head{ nullptr }, tail{nullptr}
+	Node(std::string name) : name{ name }, connections{nullptr} 
 	{
-		addNode(name);
+		connections = new std::vector<Node*>;
 	};
 
-	LinkedList& operator=(const LinkedList& copyList)
+	std::vector<Node*>* connections;
+	std::string getName() const { return name; };
+	bool isHasConnection(std::string checkNode) const
 	{
-		if (this != &copyList)
+		size_t connectionsSize{ connections->size() };
+		for (size_t counter = 0; counter < connectionsSize; counter++)
 		{
-			head = nullptr;
-			tail = nullptr;
-			
-			addNode(copyList.head->getName());
-			Node* copyNode{ copyList.head->getNext() };
-			while (copyNode != nullptr)
-			{
-				addNode(copyNode->getName());
-				copyNode = copyNode->getNext();
-			}
-		}
-		return *this;
-	}
-
-	LinkedList(const LinkedList& copyList)
-	{
-		*this = copyList;
-	}
-
-	Node* getHead() { return head; };
-
-	void addNode(std::string name)
-	{
-		Node* bufferNode{ new Node(name) };
-		bufferNode->setNext(nullptr);
-
-		if (head == nullptr)
-		{
-			head = bufferNode;
-			tail = bufferNode;
-		}
-		else
-		{
-			tail->setNext(bufferNode);
-			tail = tail->getNext();
-		}
-	}
-
-	bool hasEqual(std::string comparisonMember)
-	{
-		Node* member;
-		member = head;
-		while (member->getNext() != nullptr)
-		{
-			if (member->getName() == comparisonMember)
+			if (connections->at(counter)->getName() == checkNode)
 			{
 				return true;
 			}
-			member = member->getNext();
 		}
 		return false;
 	}
 
-	~LinkedList() 
-	{
+	~Node() 
+	{ 
 		cleanConnections();
 	};
-
 };
 
-class Graph_link
+
+
+class Graph
 {
 private:
-	std::vector<LinkedList*>* collector;
+	std::vector<Node*>* graphNodes;
+	Node* getNode(std::string name) const;
 	bool isExist(std::string name) const;
-	LinkedList* getNodeCommunity(std::string name);
-	void copyData(const Graph_link& copyGraph);
+	void copyData(const Graph& copyGraph);
 	void cleanData();
 public:
-	Graph_link(std::string initialNode);
-	Graph_link(const Graph_link& copyGraph);
-	Graph_link(Graph_link&& moveGraph);
-	Graph_link& operator=(const Graph_link& copyGraph);
-	Graph_link& operator=(Graph_link&& moveGraph);
-	void newConnection(std::string parentName, std::string childName);
-	~Graph_link();
+	Graph(std::string initialNode);
+	Graph(const Graph& copyGraph);
+	Graph(Graph&& moveGraph);
+	Graph& operator=(const Graph& other);
+	Graph& operator=(Graph&& other);
+	void addConnection(std::string parentName, std::string childName);
+	~Graph();
 };
 
