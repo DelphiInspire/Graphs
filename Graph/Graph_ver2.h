@@ -5,41 +5,38 @@ class Node
 {
 private:
 	std::string name;
+
 	void cleanConnections()
 	{
-		if (connections != nullptr)
-		{
-			connections->clear();
-			delete connections;
-			connections = nullptr;
-			name.clear();
-		}
+		connections.clear();
+		name.clear();
 	}
 public:
-	Node(std::string name) : name{ name }, connections{nullptr} 
+	std::vector<Node*> connections;
+
+	Node(std::string name) : name{ name } 
 	{
-		connections = new std::vector<Node*>;
+		connections.reserve(20);
+		connections.resize(0);
+	};
+	~Node()
+	{
+		cleanConnections();
 	};
 
-	std::vector<Node*>* connections;
 	std::string getName() const { return name; };
-	bool isHasConnection(std::string checkNode) const
+	bool hasConnection(std::string checkNode) const
 	{
-		size_t connectionsSize{ connections->size() };
+		size_t connectionsSize{ connections.size() };
 		for (size_t counter = 0; counter < connectionsSize; counter++)
 		{
-			if (connections->at(counter)->getName() == checkNode)
+			if (connections.at(counter)->getName() == checkNode)
 			{
 				return true;
 			}
 		}
 		return false;
-	}
-
-	~Node() 
-	{ 
-		cleanConnections();
-	};
+	}	
 };
 
 
@@ -48,17 +45,20 @@ class Graph
 {
 private:
 	std::vector<Node*>* graphNodes;
+
 	Node* getNode(std::string name) const;
 	bool isExist(std::string name) const;
 	void copyData(const Graph& copyGraph);
 	void cleanData();
 public:
 	Graph(std::string initialNode);
+	~Graph();
+
 	Graph(const Graph& copyGraph);
 	Graph(Graph&& moveGraph);
 	Graph& operator=(const Graph& other);
 	Graph& operator=(Graph&& other);
+
 	void addConnection(std::string parentName, std::string childName);
-	~Graph();
 };
 

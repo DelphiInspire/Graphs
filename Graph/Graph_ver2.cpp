@@ -50,11 +50,11 @@ void Graph::copyData(const Graph& copyGraph)
 	for (size_t outCounter = 0; outCounter < graphNodes->size(); outCounter++)
 	{
 		Node* copyNode{ copyGraph.graphNodes->at(outCounter) };
-		size_t connectionsSize{ copyNode->connections->size() };
+		size_t connectionsSize{ copyNode->connections.size() };
 
 		for (size_t innerCounter = 0; innerCounter < connectionsSize; innerCounter++)
 		{
-			graphNodes->at(outCounter)->connections->push_back(getNode(copyNode->connections->at(innerCounter)->getName()));
+			graphNodes->at(outCounter)->connections.push_back(getNode(copyNode->connections.at(innerCounter)->getName()));
 		}
 	}
 }
@@ -72,14 +72,14 @@ void Graph::addConnection(std::string parentName, std::string childName)
 			addConnection(childName, parentName);
 		}
 	}
-	if (!getNode(parentName)->isHasConnection(childName))
+	if (!getNode(parentName)->hasConnection(childName))
 	{
 		if (!isExist(childName))
 		{
 			graphNodes->push_back(new Node(childName));
 		}
-		getNode(parentName)->connections->push_back(getNode(childName));
-		getNode(childName)->connections->push_back(getNode(parentName));
+		getNode(parentName)->connections.push_back(getNode(childName));
+		getNode(childName)->connections.push_back(getNode(parentName));
 	}
 	else
 	{
@@ -125,6 +125,7 @@ void Graph::cleanData()
 		delete graphNodes;
 		graphNodes = nullptr;
 	}
+	
 }
 
 Graph::~Graph()
