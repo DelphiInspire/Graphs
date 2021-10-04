@@ -44,13 +44,14 @@ public:
 class Graph
 {
 private:
-	std::vector<Node*>* graphNodes;
+	std::vector<Node*> graphNodes;
 
 	Node* getNode(std::string name) const;
 	bool isExist(std::string name) const;
 	void copyData(const Graph& copyGraph);
 	void cleanData();
 public:
+	Graph() {};
 	Graph(std::string initialNode);
 	~Graph();
 

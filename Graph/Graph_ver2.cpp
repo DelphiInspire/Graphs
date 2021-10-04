@@ -1,9 +1,10 @@
 #include "Graph_ver2.h"
 
-Graph::Graph(std::string initialNode) : graphNodes{nullptr}
+Graph::Graph(std::string initialNode)
 {
-	graphNodes = new std::vector<Node*>;
-	graphNodes->push_back(new Node(initialNode));
+	graphNodes.resize(0);
+	graphNodes.reserve(20);
+	graphNodes.push_back(new Node(initialNode));
 }
 
 Graph::Graph(const Graph& other)
@@ -13,8 +14,7 @@ Graph::Graph(const Graph& other)
 
 Graph::Graph(Graph&& other)
 {
-	graphNodes = other.graphNodes;
-	other.graphNodes = nullptr;
+	graphNodes = std::move(other.graphNodes);
 }
 
 Graph& Graph::operator=(const Graph& copyGraph)
@@ -22,7 +22,6 @@ Graph& Graph::operator=(const Graph& copyGraph)
 	if (this != &copyGraph)
 	{
 		cleanData();
-		graphNodes = new std::vector<Node*>;
 		copyData(copyGraph);
 
 	}
@@ -34,27 +33,26 @@ Graph& Graph::operator=(Graph&& moveGraph)
 	if (this != &moveGraph)
 	{
 		cleanData();
-		graphNodes = moveGraph.graphNodes;
-		moveGraph.graphNodes = nullptr;
+		graphNodes = std::move(moveGraph.graphNodes);
 	}
 	return *this;
 }
 
 void Graph::copyData(const Graph& copyGraph)
 {
-	for (size_t basePointsCounter = 0; basePointsCounter < copyGraph.graphNodes->size(); basePointsCounter++)
+	for (size_t basePointsCounter = 0; basePointsCounter < copyGraph.graphNodes.size(); basePointsCounter++)
 	{
-		graphNodes->push_back(new Node(copyGraph.graphNodes->at(basePointsCounter)->getName()));
+		graphNodes.push_back(new Node(copyGraph.graphNodes.at(basePointsCounter)->getName()));
 	}
 
-	for (size_t outCounter = 0; outCounter < graphNodes->size(); outCounter++)
+	for (size_t outCounter = 0; outCounter < graphNodes.size(); outCounter++)
 	{
-		Node* copyNode{ copyGraph.graphNodes->at(outCounter) };
+		Node* copyNode{ copyGraph.graphNodes.at(outCounter) };
 		size_t connectionsSize{ copyNode->connections.size() };
 
 		for (size_t innerCounter = 0; innerCounter < connectionsSize; innerCounter++)
 		{
-			graphNodes->at(outCounter)->connections.push_back(getNode(copyNode->connections.at(innerCounter)->getName()));
+			graphNodes.at(outCounter)->connections.push_back(getNode(copyNode->connections.at(innerCounter)->getName()));
 		}
 	}
 }
@@ -76,7 +74,7 @@ void Graph::addConnection(std::string parentName, std::string childName)
 	{
 		if (!isExist(childName))
 		{
-			graphNodes->push_back(new Node(childName));
+			graphNodes.push_back(new Node(childName));
 		}
 		getNode(parentName)->connections.push_back(getNode(childName));
 		getNode(childName)->connections.push_back(getNode(parentName));
@@ -90,11 +88,11 @@ void Graph::addConnection(std::string parentName, std::string childName)
 
 Node* Graph::getNode(std::string name) const
 {
-	for (size_t headCounter = 0; headCounter < graphNodes->size(); headCounter++)
+	for (size_t headCounter = 0; headCounter < graphNodes.size(); headCounter++)
 	{
-		if (graphNodes->at(headCounter)->getName() == name)
+		if (graphNodes.at(headCounter)->getName() == name)
 		{
-			return graphNodes->at(headCounter);
+			return graphNodes.at(headCounter);
 		}
 	}
 	return nullptr;
@@ -102,10 +100,10 @@ Node* Graph::getNode(std::string name) const
 
 bool Graph::isExist(std::string name) const
 {
-	size_t collectorSize{ graphNodes->size() };
+	size_t collectorSize{ graphNodes.size() };
 	for (size_t counter = 0; counter < collectorSize; counter++)
 	{
-		if (graphNodes->at(counter)->getName() == name)
+		if (graphNodes.at(counter)->getName() == name)
 		{
 			return true;
 		}
@@ -115,17 +113,12 @@ bool Graph::isExist(std::string name) const
 
 void Graph::cleanData()
 {
-	if (graphNodes != nullptr)
-	{
-		for (std::vector<Node*>::iterator graphPointIterator = graphNodes->begin(); graphPointIterator != graphNodes->end(); graphPointIterator++)
+	
+		for (std::vector<Node*>::iterator graphPointIterator = graphNodes.begin(); graphPointIterator != graphNodes.end(); graphPointIterator++)
 		{
 			delete* graphPointIterator;
 		}
-		graphNodes->clear();
-		delete graphNodes;
-		graphNodes = nullptr;
-	}
-	
+		graphNodes.clear();	
 }
 
 Graph::~Graph()

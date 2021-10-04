@@ -3,7 +3,8 @@
 
 Graph buildGraph(std::string startNode)
 {
-	return Graph(startNode);
+	Graph res(startNode);
+	return res;
 }
 
 int main()
@@ -13,6 +14,7 @@ int main()
 	test.addConnection("A", "C");
 	test.addConnection("C", "B");
 	Graph test2(test);
+	Graph test3 = (buildGraph("A"));
 	test.~Graph();
 
 	return 0;
