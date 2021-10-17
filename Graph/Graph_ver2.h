@@ -1,36 +1,30 @@
 #include <string>
 #include <vector>
+#include <iterator>
 
 class Node
 {
 private:
 	std::string name;
-
-	void cleanConnections()
-	{
-		connections.clear();
-		name.clear();
-	}
 public:
 	std::vector<Node*> connections;
 
-	Node(std::string name) : name{ name } 
+
+public:
+	Node(const std::string& name) : name{ name } 
 	{
 		connections.reserve(20);
 		connections.resize(0);
 	};
-	~Node()
-	{
-		cleanConnections();
-	};
+	~Node(){};
 
 	std::string getName() const { return name; };
-	bool hasConnection(std::string checkNode) const
+	bool hasConnection(const std::string& searchNode) const
 	{
-		size_t connectionsSize{ connections.size() };
+		const size_t connectionsSize{ connections.size() };
 		for (size_t counter = 0; counter < connectionsSize; counter++)
 		{
-			if (connections.at(counter)->getName() == checkNode)
+			if (connections.at(counter)->getName() == searchNode)
 			{
 				return true;
 			}
@@ -44,22 +38,24 @@ public:
 class Graph
 {
 private:
+	const size_t capacity;
 	std::vector<Node*> graphNodes;
-
-	Node* getNode(std::string name) const;
-	bool isExist(std::string name) const;
+private:
+	Node* getNode(const std::string& name);
+	bool isExist(const std::string& name) const;
 	void copyData(const Graph& copyGraph);
 	void cleanData();
 public:
-	Graph() {};
-	Graph(std::string initialNode);
+	Graph(const std::string& initialNode);
 	~Graph();
 
 	Graph(const Graph& copyGraph);
 	Graph(Graph&& moveGraph);
+
 	Graph& operator=(const Graph& other);
 	Graph& operator=(Graph&& other);
 
-	void addConnection(std::string parentName, std::string childName);
+	void addConnection(const std::string& firstParticipant, const std::string& secondParticipant);
+	void deleteConnection(const std::string& deleteNode);
 };
 

@@ -1,20 +1,22 @@
 #include "Graph_ver2.h"
 
-Graph::Graph(std::string initialNode)
+Graph::Graph(const std::string& initialNode) : capacity{20}
 {
 	graphNodes.resize(0);
-	graphNodes.reserve(20);
+	graphNodes.reserve(capacity);
 	graphNodes.push_back(new Node(initialNode));
 }
 
-Graph::Graph(const Graph& other)
+Graph::Graph(const Graph& other) : capacity{ other.capacity } 
 {
 	*this = other;
 }
 
-Graph::Graph(Graph&& other)
+Graph::Graph(Graph&& other) : capacity{ other.capacity }
 {
-	graphNodes = std::move(other.graphNodes);
+
+	*this = std::move(other);
+
 }
 
 Graph& Graph::operator=(const Graph& copyGraph)
@@ -48,7 +50,7 @@ void Graph::copyData(const Graph& copyGraph)
 	for (size_t outCounter = 0; outCounter < graphNodes.size(); outCounter++)
 	{
 		Node* copyNode{ copyGraph.graphNodes.at(outCounter) };
-		size_t connectionsSize{ copyNode->connections.size() };
+		const size_t connectionsSize{ copyNode->connections.size() };
 
 		for (size_t innerCounter = 0; innerCounter < connectionsSize; innerCounter++)
 		{
@@ -57,27 +59,27 @@ void Graph::copyData(const Graph& copyGraph)
 	}
 }
 
-void Graph::addConnection(std::string parentName, std::string childName)
+void Graph::addConnection(const std::string& firstParticipant, const std::string& secondParticipant)
 {
-	if (getNode(parentName) == nullptr)
+	if (getNode(firstParticipant) == nullptr)
 	{
-		if (getNode(childName) == nullptr)
+		if (getNode(secondParticipant) == nullptr)
 		{
 			return;
 		}
 		else
 		{
-			addConnection(childName, parentName);
+			addConnection(secondParticipant, firstParticipant);
 		}
 	}
-	if (!getNode(parentName)->hasConnection(childName))
+	if (!getNode(firstParticipant)->hasConnection(secondParticipant))
 	{
-		if (!isExist(childName))
+		if (!isExist(secondParticipant))
 		{
-			graphNodes.push_back(new Node(childName));
+			graphNodes.push_back(new Node(secondParticipant));
 		}
-		getNode(parentName)->connections.push_back(getNode(childName));
-		getNode(childName)->connections.push_back(getNode(parentName));
+		getNode(firstParticipant)->connections.push_back(getNode(secondParticipant));
+		getNode(secondParticipant)->connections.push_back(getNode(firstParticipant));
 	}
 	else
 	{
@@ -86,7 +88,42 @@ void Graph::addConnection(std::string parentName, std::string childName)
 	
 }
 
-Node* Graph::getNode(std::string name) const
+void Graph::deleteConnection(const std::string& deleteNode)
+{
+	Node* outNode{ getNode(deleteNode) };
+	const size_t numNodeConnections{ outNode->connections.size() };
+	//search Node for deleting 
+	for (std::vector<Node*>::iterator mainIt = graphNodes.begin(); mainIt != graphNodes.end();)
+	{
+		if (*mainIt == outNode)
+		{
+			//go through deleting Node connections and remove this Node from neighbours connections
+			for (size_t counter = 0; counter < numNodeConnections; counter++)
+			{
+				Node* memberNode(outNode->connections.at(counter));
+				for (std::vector<Node*>::iterator memberIt = memberNode->connections.begin(); memberIt != memberNode->connections.end();)
+				{
+					if (*memberIt == outNode)
+					{
+						memberIt = memberNode->connections.erase(memberIt);
+					}
+					else
+					{
+						++memberIt;
+					}
+				}
+			}
+			mainIt = graphNodes.erase(mainIt);
+		}
+		else
+		{
+			++mainIt;
+		}	
+	}
+	delete outNode;
+}
+
+Node* Graph::getNode(const std::string& name)
 {
 	for (size_t headCounter = 0; headCounter < graphNodes.size(); headCounter++)
 	{
@@ -98,7 +135,7 @@ Node* Graph::getNode(std::string name) const
 	return nullptr;
 }
 
-bool Graph::isExist(std::string name) const
+bool Graph::isExist(const std::string& name) const
 {
 	size_t collectorSize{ graphNodes.size() };
 	for (size_t counter = 0; counter < collectorSize; counter++)
@@ -113,12 +150,14 @@ bool Graph::isExist(std::string name) const
 
 void Graph::cleanData()
 {
-	
+	if (graphNodes.size() != 0)
+	{
 		for (std::vector<Node*>::iterator graphPointIterator = graphNodes.begin(); graphPointIterator != graphNodes.end(); graphPointIterator++)
 		{
 			delete* graphPointIterator;
 		}
-		graphNodes.clear();	
+		graphNodes.clear();
+	}
 }
 
 Graph::~Graph()
