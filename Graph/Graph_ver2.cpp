@@ -1,5 +1,44 @@
 #include "Graph_ver2.h"
 
+Node::Node(const std::string& name) : name{ name }, capacityConnections{ 20 }
+{
+	connections.reserve(capacityConnections);
+	connections.resize(0);
+};
+
+void Node::addConnection(Node* newConnection)
+{
+	connections.push_back(newConnection);
+}
+
+void Node::removeConnection(Node* deletingConnection)
+{
+	for (std::vector<Node*>::iterator connections_It = connections.begin(); connections_It != connections.end();)
+	{
+		if (*connections_It == deletingConnection)
+		{
+			connections_It = connections.erase(connections_It);
+		}
+		else
+		{
+			++connections_It;
+		}
+	}
+}
+
+bool Node::hasConnection(const std::string& searchNode) const
+{
+	const size_t connectionsSize{ connections.size() };
+	for (size_t counter = 0; counter < connectionsSize; counter++)
+	{
+		if (connections.at(counter)->getName() == searchNode)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 Graph::Graph(const std::string& initialNode) : capacity{20}
 {
 	graphNodes.resize(0);
@@ -50,16 +89,16 @@ void Graph::copyData(const Graph& copyGraph)
 	for (size_t outCounter = 0; outCounter < graphNodes.size(); outCounter++)
 	{
 		Node* copyNode{ copyGraph.graphNodes.at(outCounter) };
-		const size_t connectionsSize{ copyNode->connections.size() };
+		const size_t connectionsSize{ copyNode->getConnections().size() };
 
 		for (size_t innerCounter = 0; innerCounter < connectionsSize; innerCounter++)
 		{
-			graphNodes.at(outCounter)->connections.push_back(getNode(copyNode->connections.at(innerCounter)->getName()));
+			graphNodes.at(outCounter)->getConnections().push_back(getNode(copyNode->getConnections().at(innerCounter)->getName()));
 		}
 	}
 }
 
-void Graph::addConnection(const std::string& firstParticipant, const std::string& secondParticipant)
+void Graph::makeConnection(const std::string& firstParticipant, const std::string& secondParticipant)
 {
 	if (getNode(firstParticipant) == nullptr)
 	{
@@ -69,7 +108,7 @@ void Graph::addConnection(const std::string& firstParticipant, const std::string
 		}
 		else
 		{
-			addConnection(secondParticipant, firstParticipant);
+			makeConnection(secondParticipant, firstParticipant);
 		}
 	}
 	if (!getNode(firstParticipant)->hasConnection(secondParticipant))
@@ -78,8 +117,8 @@ void Graph::addConnection(const std::string& firstParticipant, const std::string
 		{
 			graphNodes.push_back(new Node(secondParticipant));
 		}
-		getNode(firstParticipant)->connections.push_back(getNode(secondParticipant));
-		getNode(secondParticipant)->connections.push_back(getNode(firstParticipant));
+		getNode(firstParticipant)->addConnection(getNode(secondParticipant));
+		getNode(secondParticipant)->addConnection(getNode(firstParticipant));
 	}
 	else
 	{
@@ -91,7 +130,13 @@ void Graph::addConnection(const std::string& firstParticipant, const std::string
 void Graph::deleteConnection(const std::string& deleteNode)
 {
 	Node* outNode{ getNode(deleteNode) };
-	const size_t numNodeConnections{ outNode->connections.size() };
+
+	if (outNode == nullptr)
+	{
+		return;
+	}
+
+	const size_t numNodeConnections{ outNode->getConnections().size() };
 	//search Node for deleting 
 	for (std::vector<Node*>::iterator mainIt = graphNodes.begin(); mainIt != graphNodes.end();)
 	{
@@ -100,18 +145,7 @@ void Graph::deleteConnection(const std::string& deleteNode)
 			//go through deleting Node connections and remove this Node from neighbours connections
 			for (size_t counter = 0; counter < numNodeConnections; counter++)
 			{
-				Node* memberNode(outNode->connections.at(counter));
-				for (std::vector<Node*>::iterator memberIt = memberNode->connections.begin(); memberIt != memberNode->connections.end();)
-				{
-					if (*memberIt == outNode)
-					{
-						memberIt = memberNode->connections.erase(memberIt);
-					}
-					else
-					{
-						++memberIt;
-					}
-				}
+				outNode->getConnections().at(counter)->removeConnection(outNode);
 			}
 			mainIt = graphNodes.erase(mainIt);
 		}

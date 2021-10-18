@@ -9,7 +9,7 @@ int main()
 	*C = *B;
 	A = new Graph("P");
 	*A = std::move(*C);
-	A->addConnection("A", "K");
+	A->makeConnection("A", "K");
 	A->deleteConnection("K");
 	delete A;
 	delete B;

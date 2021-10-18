@@ -6,31 +6,20 @@ class Node
 {
 private:
 	std::string name;
-public:
 	std::vector<Node*> connections;
-
-
+	const size_t capacityConnections;
 public:
-	Node(const std::string& name) : name{ name } 
-	{
-		connections.reserve(20);
-		connections.resize(0);
-	};
+	Node(const std::string& name); 
 	~Node(){};
 
 	std::string getName() const { return name; };
-	bool hasConnection(const std::string& searchNode) const
-	{
-		const size_t connectionsSize{ connections.size() };
-		for (size_t counter = 0; counter < connectionsSize; counter++)
-		{
-			if (connections.at(counter)->getName() == searchNode)
-			{
-				return true;
-			}
-		}
-		return false;
-	}	
+	std::vector<Node*>& getConnections() { return connections; }
+
+	void addConnection(Node* newConnection);
+
+	void removeConnection(Node* deletingConnection);
+
+	bool hasConnection(const std::string& searchNode) const;
 };
 
 
@@ -55,7 +44,7 @@ public:
 	Graph& operator=(const Graph& other);
 	Graph& operator=(Graph&& other);
 
-	void addConnection(const std::string& firstParticipant, const std::string& secondParticipant);
+	void makeConnection(const std::string& firstParticipant, const std::string& secondParticipant);
 	void deleteConnection(const std::string& deleteNode);
 };
 
